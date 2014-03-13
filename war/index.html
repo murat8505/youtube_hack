@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Quirks Mode". Replacing this declaration     -->
+<!-- with a "Standards Mode" doctype is supported, -->
+<!-- but may lead to some differences in layout.   -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>music-instant</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+	<style type="text/css">
+	.centered {
+	position: fixed;
+	top:20%;
+	z-index: 100;
+	left: 50%;
+	margin: -100px 0 0 -100px;
+	width: 300px;
+	height: 300px;
+	text-align: center;
+	opacity: 0.8;
+	}
+	.below {
+	position: fixed;
+	top:40%;
+	z-index: 100;
+	left: 40%;
+	margin: 0px 0 0 -100px;
+	text-align: center;
+	opacity: 0.8;
+	}
+	#div-1 { float: left; }
+	#div-2 { display: inline; }
+	#div-3 { float: right; }
+	.logo {
+	position: fixed;
+	top:5%;
+	z-index: 100;
+	left: 45%;
+	margin: -50px 0 0 -100px;
+	width: 500px;
+	height: 300px;
+	text-align: center;
+	opacity: 0.8;
+	}
+	</style>
+	<script src="js/jquery.js"></script>
+  </head>
+  <body>
+        <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div class="below" id="player"></div>
+
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: '-KMpZaEF6g0',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(stopVideo, 6000);
+          done = true;
+        }
+      }
+      function stopVideo() {
+        player.stopVideo();
+      }
+    </script>
+    <div class="container">
+      <div class="logo">
+          	<div id="div-1"><img src="images/prev.png"></div>
+          	<div id="div-2"><img src="images/logo.png"></div>
+          	<div id="div-3"><img src="images/next.png"></div>
+      </div>
+     <div class="centered">
+    	<input type="text" id="search" placeholder="Search" class="form-control" />
+     </div>
+     </div>
+    <script>
+     $('#search').keydown(function(event){
+    	 if (event.which == 13) {
+    		 $.post( "beathangar", { searchstring : $('#search').val()})
+    		  .done(function( data ) {
+    			  var arr=[];
+    			  for(var i=0;i<data.length;i++){
+    				  arr.push(data[i].id);
+    			  }
+    			  player.cuePlaylist(arr);
+    			  
+    		  });
+    		 
+    	 }
+    	 
+     });
+     $('#div-1').click(function(event){
+    	player.previousVideo(); 
+     });
+     $('#div-3').click(function(event){
+     	player.nextVideo(); 
+      });
+    </script>
+  </body>
+</html>
