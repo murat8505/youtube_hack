@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-
 import nikunjy.beathangar.GlobalConstants;
 
 public class QueryUtils {
@@ -72,6 +71,7 @@ public class QueryUtils {
 		if (GlobalConstants.DEBUG) {
 			System.out.println(query);
 		}
+		System.out.println(query);
 		URL uri;
 		HttpURLConnection conn;
 		BufferedReader rd;
