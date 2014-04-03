@@ -1,6 +1,4 @@
 package nikunjy.beathangar;
-import static com.googlecode.objectify.ObjectifyService.ofy;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,6 +19,8 @@ import javax.servlet.http.HttpSession;
 import nikunj.beathangar.ml.api.ArtistUtils;
 import nikunj.beathangar.model.Album;
 import nikunj.beathangar.model.Artist;
+import nikunj.beathangar.model.DataBaseUtils;
+import nikunj.beathangar.model.MemcacheUtils;
 import nikunj.beathangar.model.User;
 import nikunj.beathangar.model.UserHistory;
 
@@ -36,6 +36,7 @@ public class SignInFB extends HttpServlet {
 		ObjectifyService.register(Artist.class);
 		ObjectifyService.register(Album.class);
 		ObjectifyService.register(UserHistory.class);
+		MemcacheUtils.init();
 	}
 	public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {            
 		String code = req.getParameter("code");
@@ -115,7 +116,7 @@ public class SignInFB extends HttpServlet {
 		HttpSession session = req.getSession();
 		session.setAttribute("userid",facebookId);
 		res.setContentType("text/plain");
-		User foundUser = ofy().load().type(User.class).id(facebookId).get();
+		User foundUser = DataBaseUtils.getUser(facebookId);
 		List<String> userArtists = new ArrayList<String>();
 		if (foundUser == null) {
 			Map<String,Integer> artists = ArtistUtils.getArtistsWithConfidence(music);
@@ -133,7 +134,7 @@ public class SignInFB extends HttpServlet {
 			user.setEmail(email);
 			user.setProfilePic(pictureUrl);
 			user.setMusic(userArtists);
-			ofy().save().entity(user);
+			DataBaseUtils.saveUser(user);
 			req.setAttribute("musicList",user.getMusic());
 			req.setAttribute("name", user.getFirstName());
 			req.setAttribute("image", user.getProfilePic());
